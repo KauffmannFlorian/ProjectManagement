@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pilotage multi-projets : exemples de suivi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --surface-2:#EBEEF3; --ink:#18212F; --ink-2:#4A5568; --line:#D5DAE2;
+  --p1:#0E7A7E; --p2:#4B4FC4; --p3:#B26B12;
+  --ok:#2F855A; --warn:#C98A12; --ko:#C0392B; --ok-bg:#E3F3EA; --warn-bg:#FBF0D9; --ko-bg:#F8E1DE;
+  --today:#C0392B;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#111722; --surface:#1A2230; --surface-2:#232D3D; --ink:#E8ECF2; --ink-2:#A4AFBF; --line:#334055;
+    --p1:#2BB3B8; --p2:#8B8EF0; --p3:#E0A04A;
+    --ok:#5CC98D; --warn:#E8B64A; --ko:#EF7A6C; --ok-bg:#1D3A2C; --warn-bg:#3D3219; --ko-bg:#42211E; --today:#EF7A6C;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111722; --surface:#1A2230; --surface-2:#232D3D; --ink:#E8ECF2; --ink-2:#A4AFBF; --line:#334055;
+  --p1:#2BB3B8; --p2:#8B8EF0; --p3:#E0A04A;
+  --ok:#5CC98D; --warn:#E8B64A; --ko:#EF7A6C; --ok-bg:#1D3A2C; --warn-bg:#3D3219; --ko-bg:#42211E; --today:#EF7A6C;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 20px 60px}
+header.top{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+h1{font-size:1.75rem;line-height:1.15;margin:0;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--ink-2);margin:6px 0 0;max-width:70ch}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--ink-2)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:22px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+nav.tabs button{font:inherit;font-weight:500;background:none;border:0;color:var(--ink-2);padding:12px 14px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--p2);outline-offset:2px}
+section.panel{display:none} section.panel.on{display:block}
+.intro{color:var(--ink-2);max-width:78ch;margin:0 0 18px}
+.intro b{color:var(--ink)}
+h2{font-size:1.2rem;margin:0 0 6px}
+h3{font-size:1rem;margin:0 0 8px}
+
+/* Portefeuille */
+.projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:26px}
+.proj{background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--c);border-radius:6px;padding:16px 18px}
+.proj .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.proj .client{color:var(--ink-2);font-size:.85rem}
+.status{font-size:.8rem;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.s-ok{background:var(--ok-bg);color:var(--ok)} .s-warn{background:var(--warn-bg);color:var(--warn)} .s-ko{background:var(--ko-bg);color:var(--ko)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.88rem;margin:12px 0}
+.kv dt{color:var(--ink-2)} .kv dd{margin:0}
+.bar{height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden;margin:4px 0 2px}
+.bar i{display:block;height:100%;background:var(--c)}
+.proj .alert{font-size:.88rem;border-left:3px solid var(--ko);padding:6px 10px;background:var(--ko-bg);border-radius:0 4px 4px 0;margin-top:10px}
+.proj .alert.w{border-color:var(--warn);background:var(--warn-bg)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px}
+.list{list-style:none;padding:0;margin:0}
+.list li{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:.9rem;align-items:baseline}
+.list li:first-child{border-top:0}
+.list .when{min-width:74px;color:var(--ink-2);font-size:.82rem}
+.tag{font-size:.75rem;font-weight:600;padding:1px 7px;border-radius:4px;color:#fff;white-space:nowrap}
+.t1{background:var(--p1)} .t2{background:var(--p2)} .t3{background:var(--p3)}
+:root[data-theme="dark"] .tag, :root:not([data-theme="light"]) .tag{color:#fff}
+
+/* Gantt */
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.gantt{display:grid;min-width:980px;position:relative}
+.g-h,.g-c{border-left:1px solid var(--line);font-size:.78rem;color:var(--ink-2);text-align:center;padding:8px 0}
+.g-h.cur{color:var(--today);font-weight:700}
+.g-label{padding:7px 12px;font-size:.86rem;border-top:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-label.grp{font-weight:700;background:var(--surface-2)}
+.g-row{border-top:1px solid var(--line);position:relative;height:34px}
+.g-row.grp{background:var(--surface-2)}
+.g-bar{position:absolute;top:8px;height:18px;border-radius:4px;background:var(--c);opacity:.9;font-size:.72rem;color:#fff;padding:0 6px;line-height:18px;white-space:nowrap;overflow:hidden}
+.g-bar.done{opacity:.45}
+.g-bar.late{background:repeating-linear-gradient(45deg,var(--c),var(--c) 6px,var(--ko) 6px,var(--ko) 9px)}
+.g-ms{position:absolute;top:9px;width:16px;height:16px;transform:rotate(45deg);background:var(--ink);border:2px solid var(--surface)}
+.g-dep{position:absolute;top:9px;width:16px;height:16px;border-radius:50%;border:3px solid var(--warn);background:var(--surface)}
+.g-dep.ko{border-color:var(--ko)}
+.g-today{position:absolute;top:0;bottom:0;width:2px;background:var(--today);z-index:2;pointer-events:none}
+.g-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:.82rem;color:var(--ink-2);margin-top:10px;align-items:center}
+.g-legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:14px;height:12px;border-radius:2px}
+
+/* Kanban */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.chip{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 12px;border-radius:20px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.kanban{display:grid;grid-template-columns:repeat(6,minmax(190px,1fr));gap:10px;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--surface-2);border-radius:6px;padding:10px;min-height:280px}
+.col h3{font-size:.88rem;display:flex;justify-content:space-between}
+.col h3 small{color:var(--ink-2);font-weight:500}
+.col.block{background:var(--ko-bg)}
+.col.over{outline:2px dashed var(--p2)}
+.card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:4px;padding:8px 10px;margin-bottom:8px;font-size:.85rem;cursor:grab}
+.card .meta{display:flex;justify-content:space-between;color:var(--ink-2);font-size:.76rem;margin-top:6px;gap:6px}
+.card.dragging{opacity:.4}
+.wip{color:var(--ko);font-weight:700}
+.reset{font:inherit;font-size:.82rem;background:none;border:0;color:var(--ink-2);text-decoration:underline;cursor:pointer;margin-left:auto}
+
+/* Tables */
+table{border-collapse:collapse;width:100%;font-size:.88rem;background:var(--surface)}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-weight:600;background:var(--surface-2);white-space:nowrap}
+th.sort{cursor:pointer} th.sort:hover{color:var(--p2)}
+td.num,th.num{text-align:right}
+td input{width:62px;font:inherit;font-size:.85rem;padding:3px 5px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);text-align:right}
+.score{font-weight:700}
+.rank{color:var(--ink-2)}
+.crit{font-weight:600;font-size:.78rem;padding:2px 8px;border-radius:4px}
+.typeR{color:var(--ko)} .typeA{color:var(--p2)} .typeI{color:var(--warn)} .typeD{color:var(--p1)}
+.late-txt{color:var(--ko);font-weight:600}
+
+/* DORA */
+.dora{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:18px}
+.metric .val{font-size:1.6rem;font-weight:700;line-height:1.1}
+.metric .lvl{font-size:.8rem;color:var(--ink-2)}
+.metric svg{width:100%;height:46px;display:block;margin-top:8px}
+.note{font-size:.88rem;color:var(--ink-2);border-left:3px solid var(--p2);padding:8px 12px;background:var(--surface);max-width:80ch}
+
+/* Incidents */
+.inc-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+.inc-kpi .box{padding:12px 16px}
+.inc-kpi .v{font-size:1.5rem;font-weight:700;line-height:1.2}
+.inc-kpi .l{font-size:.82rem;color:var(--ink-2)}
+.sev1{background:var(--ko);color:#fff} .sev2{background:var(--ko-bg);color:var(--ko)}
+.sev3{background:var(--warn-bg);color:var(--warn)} .sev4{background:var(--surface-2);color:var(--ink-2)}
+table.sev{font-size:.82rem} table.sev td,table.sev th{padding:7px 8px}
+.flow{list-style:none;padding:0;margin:0;counter-reset:f}
+.flow li{counter-increment:f;position:relative;padding:0 0 12px 34px;font-size:.88rem}
+.flow li::before{content:counter(f);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:.75rem;font-weight:700;display:grid;place-items:center}
+.flow li:not(:last-child)::after{content:"";position:absolute;left:10px;top:24px;bottom:2px;width:2px;background:var(--line)}
+.flow b{display:block} .flow span{color:var(--ink-2)}
+#incT tr.row{cursor:pointer} #incT tr.row:hover td{background:var(--surface-2)}
+#incT tr.sel td{background:var(--surface-2)}
+#incT tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--p2)}
+.sla-ok{color:var(--ok);font-weight:600} .sla-ko{color:var(--ko);font-weight:600}
+.tl{list-style:none;padding:0;margin:8px 0 0}
+.tl li{display:grid;grid-template-columns:90px 110px 1fr;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:.86rem}
+.tl .who{color:var(--ink-2)}
+@media (max-width:640px){.tl li{grid-template-columns:1fr}}
+
+/* Point client */
+.cr{max-width:820px}
+.cr ol{padding-left:20px;margin:6px 0 14px} .cr li{margin:4px 0}
+.cr .box{margin-bottom:14px}
+footer{margin-top:40px;font-size:.8rem;color:var(--ink-2)}
+@media (max-width:640px){h1{font-size:1.4rem}.wrap{padding:18px 14px 40px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <h1>Pilotage de trois projets en parallèle</h1>
+    <p class="sub">Exemples de supports de suivi pour un rôle de chef de projet aux côtés du directeur technique. Données fictives, semaine 39 de 2026.</p>
+  </div>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--p1)"></i>Appli réservation</span>
+    <span><i class="dot" style="background:var(--p2)"></i>Portail B2B</span>
+    <span><i class="dot" style="background:var(--p3)"></i>Intégration ERP</span>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" aria-selected="true" data-t="port">Portefeuille</button>
+  <button role="tab" aria-selected="false" data-t="gantt">Planning (Gantt)</button>
+  <button role="tab" aria-selected="false" data-t="kanban">Kanban</button>
+  <button role="tab" aria-selected="false" data-t="rice">Backlog RICE</button>
+  <button role="tab" aria-selected="false" data-t="raid">Registre RAID</button>
+  <button role="tab" aria-selected="false" data-t="attentes">Attentes client</button>
+  <button role="tab" aria-selected="false" data-t="incidents">Incidents</button>
+  <button role="tab" aria-selected="false" data-t="dora">Indicateurs DORA</button>
+  <button role="tab" aria-selected="false" data-t="point">Point client</button>
+</nav>
+
+<!-- PORTEFEUILLE -->
+<section class="panel on" id="port">
+  <p class="intro">La vue que je partage chaque semaine avec la direction : <b>une météo par projet</b>, l'écart au planning initial et les alertes qui nécessitent une décision ou une relance client.</p>
+  <div class="projects" id="projCards"></div>
+  <div class="two">
+    <div class="box">
+      <h3>Jalons des quatre prochaines semaines</h3>
+      <ul class="list" id="nextMs"></ul>
+    </div>
+    <div class="box">
+      <h3>Points clients planifiés</h3>
+      <ul class="list" id="nextMeet"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- GANTT -->
+<section class="panel" id="gantt">
+  <p class="intro">Planning consolidé des trois projets. Les ronds signalent <b>ce que le client doit fournir</b> : c'est là que se jouent la plupart des retards. Le trait rouge marque la semaine en cours.</p>
+  <div class="scroll"><div class="gantt" id="ganttGrid"></div></div>
+  <div class="g-legend">
+    <span><i class="sw" style="background:var(--p2)"></i>Tâche planifiée</span>
+    <span><i class="sw" style="background:var(--p2);opacity:.45"></i>Terminée</span>
+    <span><i class="sw" style="background:repeating-linear-gradient(45deg,var(--p2),var(--p2) 4px,var(--ko) 4px,var(--ko) 6px)"></i>Glissement</span>
+    <span><i class="g-ms" style="position:static;transform:rotate(45deg);width:11px;height:11px"></i>Jalon / mise en service</span>
+    <span><i class="g-dep" style="position:static;width:12px;height:12px"></i>Livrable client attendu</span>
+    <span><i class="g-dep ko" style="position:static;width:12px;height:12px"></i>Livrable client en retard</span>
+  </div>
+</section>
+
+<!-- KANBAN -->
+<section class="panel" id="kanban">
+  <p class="intro">Tableau de l'itération en cours, alimenté avec le directeur technique. Une colonne dédiée <b>« Bloqué côté client »</b> rend visibles les attentes à relancer. Les cartes se déplacent par glisser-déposer.</p>
+  <div class="filters" id="kFilters"></div>
+  <div class="kanban" id="kBoard"></div>
+</section>
+
+<!-- RICE -->
+<section class="panel" id="rice">
+  <p class="intro">Aide à l'arbitrage du backlog avec le client : <b>Reach</b> (utilisateurs touchés par trimestre), <b>Impact</b> (0,25 à 3), <b>Confiance</b> (%), <b>Effort</b> (personnes-semaines, estimé par l'équipe technique). Score = R × I × C ÷ E. Les valeurs sont modifiables.</p>
+  <div class="filters" id="rFilters"></div>
+  <div class="scroll"><table id="riceT"></table></div>
+</section>
+
+<!-- RAID -->
+<section class="panel" id="raid">
+  <p class="intro">Registre des <b>Risques, Actions, Problèmes (Issues) et Dépendances</b>. Revu chaque semaine ; chaque ligne a un porteur et une échéance.</p>
+  <div class="filters" id="raidFilters"></div>
+  <div class="scroll"><table id="raidT"></table></div>
+</section>
+
+<!-- ATTENTES -->
+<section class="panel" id="attentes">
+  <p class="intro">Ce dont le développement a besoin de la part des clients, <b>avec la date à laquelle il en a besoin</b> et l'impact si l'élément arrive en retard. C'est la base des relances et de l'ordre du jour des points clients.</p>
+  <div class="scroll"><table id="attT"></table></div>
+</section>
+
+<!-- INCIDENTS -->
+<section class="panel" id="incidents">
+  <p class="intro">Le diagnostic et la correction restent entre les mains du directeur technique et de l'équipe. Mon rôle : <b>qualifier l'impact avec le client, tenir la communication, suivre les délais d'engagement</b> et m'assurer que les actions de la revue post-incident sont réalisées.</p>
+  <div class="inc-kpi" id="incKpi"></div>
+
+  <div class="two" style="margin-bottom:18px">
+    <div class="box">
+      <h3>Niveaux de gravité et engagements</h3>
+      <div class="scroll" style="border:0"><table class="sev">
+        <tr><th>Niveau</th><th>Exemple</th><th>Prise en charge</th><th>Rétablissement</th><th>Info client</th></tr>
+        <tr><td><span class="crit sev1">P1 bloquant</span></td><td>Service indisponible, paiement impossible</td><td>30 min</td><td>4 h</td><td>Toutes les heures</td></tr>
+        <tr><td><span class="crit sev2">P2 majeur</span></td><td>Fonction clé dégradée, contournement possible</td><td>2 h</td><td>1 jour ouvré</td><td>2 fois par jour</td></tr>
+        <tr><td><span class="crit sev3">P3 mineur</span></td><td>Anomalie gênante sans blocage</td><td>1 jour ouvré</td><td>Prochaine livraison</td><td>Au point hebdo</td></tr>
+        <tr><td><span class="crit sev4">P4 cosmétique</span></td><td>Libellé, affichage</td><td>Backlog</td><td>Selon priorité</td><td>Au point hebdo</td></tr>
+      </table></div>
+      <p style="font-size:.8rem;color:var(--ink-2);margin:8px 0 0">Délais indicatifs, à aligner sur le contrat de chaque client.</p>
+    </div>
+    <div class="box">
+      <h3>Déroulé d'un incident et qui fait quoi</h3>
+      <ol class="flow">
+        <li><b>Détection</b><span>Alerte de supervision ou signalement client. Ticket créé immédiatement.</span></li>
+        <li><b>Qualification</b><span>Gravité fixée avec le directeur technique ; impact métier confirmé avec le client.</span></li>
+        <li><b>Communication</b><span>Premier message au client dans le délai de prise en charge, puis à la fréquence prévue.</span></li>
+        <li><b>Résolution</b><span>Correctif ou contournement par l'équipe technique. Je suis le délai et prépare le message de clôture.</span></li>
+        <li><b>Revue post-incident</b><span>Pour les P1 et P2 : causes, actions préventives, porteurs et échéances, reportées dans le RAID.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="filters" id="incFilters"></div>
+  <div class="scroll"><table id="incT"></table></div>
+  <div class="box" id="incDetail" style="margin-top:16px"></div>
+</section>
+
+<!-- DORA -->
+<section class="panel" id="dora">
+  <p class="intro">Les quatre indicateurs DORA mesurent la santé de la chaîne de livraison, sur huit semaines. Filtre par projet :</p>
+  <div class="filters" id="dFilters"></div>
+  <div class="dora" id="doraCards"></div>
+  <p class="note">Ces indicateurs sont extraits de l'outillage choisi par le directeur technique. Mon rôle est de les suivre et de les relier aux engagements de livraison, pas de décider des pratiques techniques qui les font évoluer.</p>
+</section>
+
+<!-- POINT CLIENT -->
+<section class="panel" id="point">
+  <div class="cr">
+    <p class="intro">Trame que je prépare avant chaque point client et compte rendu envoyé dans les 24 heures. Exemple rempli pour l'intégration ERP.</p>
+    <div class="box">
+      <h3>Ordre du jour, envoyé la veille</h3>
+      <ol>
+        <li>Avancement depuis le dernier point et démonstration courte</li>
+        <li>Planning : écart au prévisionnel et prochain jalon</li>
+        <li>Éléments attendus de votre côté, avec leurs dates de besoin</li>
+        <li>Décisions à prendre ensemble</li>
+        <li>Risques et points d'attention</li>
+      </ol>
+    </div>
+    <div class="box">
+      <h3>Compte rendu : Cabinet Arvel, jeudi 24 septembre</h3>
+      <dl class="kv">
+        <dt>Présents</dt><dd>M. Arvel (sponsor), R. Danet (DSI client), directeur technique Breathe, chef de projet</dd>
+        <dt>Météo</dt><dd><span class="status s-ko">Rouge</span> une semaine de retard sur le lot synchronisation</dd>
+        <dt>Cause</dt><dd>Accès à l'environnement de test de l'ERP demandé le 15/09, toujours non fourni</dd>
+      </dl>
+      <h3>Décisions</h3>
+      <ol>
+        <li>La DSI client fournit les accès avant le 29/09 ; à défaut, escalade au sponsor.</li>
+        <li>La mise en service reste fixée en semaine 48 ; la marge de recette passe de deux à une semaine.</li>
+      </ol>
+      <h3>Actions</h3>
+      <table>
+        <tr><th>Action</th><th>Porteur</th><th>Échéance</th></tr>
+        <tr><td>Fournir les identifiants de l'environnement de test</td><td>R. Danet</td><td>29/09</td></tr>
+        <tr><td>Valider le mapping des champs clients et factures</td><td>M. Arvel</td><td>02/10</td></tr>
+        <tr><td>Mettre à jour le planning et le diffuser</td><td>Chef de projet</td><td>25/09</td></tr>
+      </table>
+      <p style="margin:12px 0 0;color:var(--ink-2);font-size:.88rem">Prochain point : jeudi 1er octobre, 10 h, 30 minutes.</p>
+    </div>
+  </div>
+</section>
+
+<footer>Données fictives à titre d'illustration. Semaine de référence : S39 2026.</footer>
+</div>
+
+<script>
+const P = {
+  p1:{name:"Appli réservation", client:"Hôtels Lumen", c:"var(--p1)", t:"t1"},
+  p2:{name:"Portail B2B", client:"Distrib Nord", c:"var(--p2)", t:"t2"},
+  p3:{name:"Intégration ERP", client:"Cabinet Arvel", c:"var(--p3)", t:"t3"}
+};
+const TODAY = 39;
+const tag = k => `<span class="tag ${P[k].t}">${P[k].name}</span>`;
+
+/* Tabs */
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('section.panel').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));
+  try{localStorage.setItem('tab',b.dataset.t)}catch(e){}
+}));
+try{const t=localStorage.getItem('tab'); if(t){const b=document.querySelector(`nav.tabs button[data-t="${t}"]`); b&&b.click();}}catch(e){}
+
+/* Portefeuille */
+const port = [
+  {k:"p1",st:"warn",stL:"Vigilance",pct:58,golive:"S45 (06/11)",ecart:"+3 jours",budget:"62 % consommé",next:"Recette lot 2, S41",
+   alert:{w:1,txt:"Maquettes des écrans de paiement attendues le 22/09, reçues partiellement. Relance faite, réponse attendue lundi."}},
+  {k:"p2",st:"ok",stL:"Dans les temps",pct:34,golive:"S50 (11/12)",ecart:"0",budget:"31 % consommé",next:"Démo espace client, S40",alert:null},
+  {k:"p3",st:"ko",stL:"En retard",pct:41,golive:"S48 (27/11)",ecart:"+1 semaine",budget:"45 % consommé",next:"Synchronisation factures, S42",
+   alert:{w:0,txt:"Accès à l'environnement de test de l'ERP non fourni depuis 10 jours. Escalade au sponsor si rien lundi."}}
+];
+document.getElementById('projCards').innerHTML = port.map(p=>`
+<article class="proj" style="--c:${P[p.k].c}">
+  <div class="head"><div><h3 style="margin:0">${P[p.k].name}</h3><div class="client">${P[p.k].client}</div></div>
+  <span class="status s-${p.st}">${p.stL}</span></div>
+  <div class="bar" aria-label="Avancement ${p.pct} %"><i style="width:${p.pct}%"></i></div>
+  <div class="client">Avancement ${p.pct} %</div>
+  <dl class="kv"><dt>Mise en service</dt><dd>${p.golive}</dd><dt>Écart</dt><dd>${p.ecart}</dd><dt>Budget</dt><dd>${p.budget}</dd><dt>Prochain jalon</dt><dd>${p.next}</dd></dl>
+  ${p.alert?`<div class="alert ${p.alert.w?'w':''}">${p.alert.txt}</div>`:''}
+</article>`).join('');
+const ms=[["S40","p2","Démo espace client"],["S41","p1","Recette lot 2"],["S42","p3","Synchronisation factures (décalée de S41)"],["S43","p2","Validation parcours commande"]];
+document.getElementById('nextMs').innerHTML = ms.map(m=>`<li><span class="when">${m[0]}</span>${tag(m[1])}<span>${m[2]}</span></li>`).join('');
+const meet=[["Lun 28/09","p1","Hebdo, 30 min : arbitrage écrans paiement"],["Mar 29/09","p2","Hebdo, 30 min"],["Jeu 01/10","p3","Hebdo, 30 min : point accès ERP"],["Jeu 08/10","p2","Comité de pilotage mensuel"]];
+document.getElementById('nextMeet').innerHTML = meet.map(m=>`<li><span class="when">${m[0]}</span>${tag(m[1])}<span>${m[2]}</span></li>`).join('');
+
+/* Gantt */
+const W0=36, W1=51, NW=W1-W0+1;
+const G=[
+ {k:"p1",rows:[
+  ["Cadrage et maquettes",36,37,"done"],["Lot 1 : compte et recherche",37,39,"done"],["Lot 2 : réservation et paiement",39,41,"late"],
+  ["Recette et corrections",42,44],["dep","Maquettes paiement",38,"ko"],["dep","Contenus hôtels",41],["ms","Mise en service",45]]},
+ {k:"p2",rows:[
+  ["Cadrage",36,38,"done"],["Espace client",38,40],["Parcours commande",41,44],["Back-office",44,47],["Recette client",48,49],
+  ["dep","Catalogue produits",40],["dep","Validation charte",43],["ms","Démo",40],["ms","Mise en service",50]]},
+ {k:"p3",rows:[
+  ["Analyse des flux",36,37,"done"],["Connecteur clients",38,40,"late"],["Synchronisation factures",41,43,"late"],["Recette et bascule",45,47],
+  ["dep","Accès environnement test",38,"ko"],["dep","Mapping des champs",40],["ms","Mise en service",48]]}
+];
+(function(){
+  const g=document.getElementById('ganttGrid');
+  g.style.gridTemplateColumns=`220px repeat(${NW},1fr)`;
+  let h=`<div class="g-label" style="border-top:0;font-weight:600">Tâche</div>`;
+  for(let w=W0;w<=W1;w++) h+=`<div class="g-h ${w===TODAY?'cur':''}">S${w}</div>`;
+  G.forEach(p=>{
+    h+=`<div class="g-label grp" style="color:${P[p.k].c}">${P[p.k].name} · ${P[p.k].client}</div><div class="g-row grp" style="grid-column:span ${NW}"></div>`;
+    p.rows.forEach(r=>{
+      let label,inner;
+      const pos=w=>((w-W0)/NW*100);
+      if(r[0]==="dep"){label="↳ Client : "+r[1];inner=`<i class="g-dep ${r[3]==='ko'?'ko':''}" style="left:calc(${pos(r[2])}% + ${100/NW/2}% - 8px)" title="${r[1]}"></i>`;}
+      else if(r[0]==="ms"){label="◆ "+r[1];inner=`<i class="g-ms" style="left:calc(${pos(r[2])}% + ${100/NW/2}% - 8px)" title="${r[1]}"></i>`;}
+      else{label=r[0];inner=`<div class="g-bar ${r[3]||''}" style="--c:${P[p.k].c};left:${pos(r[1])}%;width:calc(${(r[2]-r[1]+1)/NW*100}% - 4px);margin-left:2px">${r[3]==='late'?'glissement':''}</div>`;}
+      h+=`<div class="g-label" title="${label}">${label}</div><div class="g-row" style="grid-column:span ${NW}">${inner}</div>`;
+    });
+  });
+  g.innerHTML=h;
+  const line=document.createElement('div');line.className='g-today';
+  line.style.left=`calc(220px + (100% - 220px) * ${(TODAY-W0+0.5)/NW})`;
+  g.appendChild(line);
+})();
+
+/* Kanban */
+const COLS=[["backlog","Backlog"],["todo","À faire"],["doing","En cours",4],["client","Bloqué côté client"],["recette","En recette"],["done","Terminé"]];
+const K0=[
+ {id:1,k:"p1",t:"Écran de paiement",who:"Dév. front",pts:5,c:"client"},
+ {id:2,k:"p1",t:"Filtre de recherche par date",who:"Dév. front",pts:3,c:"recette"},
+ {id:3,k:"p1",t:"Notifications de confirmation",who:"Dév. back",pts:3,c:"doing"},
+ {id:4,k:"p1",t:"Politique d'annulation",who:"—",pts:2,c:"backlog"},
+ {id:5,k:"p2",t:"Tableau de bord client",who:"Dév. front",pts:5,c:"doing"},
+ {id:6,k:"p2",t:"Import du catalogue",who:"Dév. back",pts:8,c:"client"},
+ {id:7,k:"p2",t:"Authentification SSO",who:"Dév. back",pts:5,c:"done"},
+ {id:8,k:"p2",t:"Historique des commandes",who:"—",pts:3,c:"todo"},
+ {id:9,k:"p3",t:"Connecteur clients",who:"Dév. back",pts:8,c:"client"},
+ {id:10,k:"p3",t:"Journal des erreurs de synchro",who:"Dév. back",pts:3,c:"doing"},
+ {id:11,k:"p3",t:"Mapping des factures",who:"—",pts:5,c:"todo"},
+ {id:12,k:"p3",t:"Analyse des flux",who:"Dév. back",pts:3,c:"done"},
+ {id:13,k:"p2",t:"Export PDF des devis",who:"—",pts:3,c:"backlog"},
+ {id:14,k:"p1",t:"Traductions anglais",who:"—",pts:2,c:"backlog"}
+];
+let K; try{K=JSON.parse(localStorage.getItem('kanban'))}catch(e){} if(!Array.isArray(K)) K=JSON.parse(JSON.stringify(K0));
+let kf="all";
+function saveK(){try{localStorage.setItem('kanban',JSON.stringify(K))}catch(e){}}
+function chips(el,cur,on){
+  const opts=[["all","Tous les projets"],...Object.keys(P).map(k=>[k,P[k].name])];
+  el.innerHTML=opts.map(o=>`<button class="chip" aria-pressed="${o[0]===cur}" data-v="${o[0]}">${o[1]}</button>`).join('');
+  el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>on(b.dataset.v));
+}
+function renderK(){
+  chips(document.getElementById('kFilters'),kf,v=>{kf=v;renderK()});
+  const f=document.getElementById('kFilters');
+  const r=document.createElement('button');r.className='reset';r.textContent='Réinitialiser le tableau';
+  r.onclick=()=>{K=JSON.parse(JSON.stringify(K0));saveK();renderK()};f.appendChild(r);
+  const b=document.getElementById('kBoard');
+  b.innerHTML=COLS.map(([id,l,wip])=>{
+    const items=K.filter(x=>x.c===id&&(kf==="all"||x.k===kf));
+    const all=K.filter(x=>x.c===id).length;
+    const over=wip&&all>wip;
+    return `<div class="col ${id==='client'?'block':''}" data-c="${id}"><h3>${l}<small class="${over?'wip':''}">${all}${wip?' / '+wip+' max':''}</small></h3>
+    ${items.map(x=>`<div class="card" draggable="true" data-id="${x.id}" style="--c:${P[x.k].c}">${x.t}<div class="meta"><span>${P[x.k].name}</span><span>${x.who} · ${x.pts} pts</span></div></div>`).join('')}</div>`;
+  }).join('');
+  b.querySelectorAll('.card').forEach(c=>{
+    c.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',c.dataset.id);c.classList.add('dragging')});
+    c.addEventListener('dragend',()=>c.classList.remove('dragging'));
+  });
+  b.querySelectorAll('.col').forEach(col=>{
+    col.addEventListener('dragover',e=>{e.preventDefault();col.classList.add('over')});
+    col.addEventListener('dragleave',()=>col.classList.remove('over'));
+    col.addEventListener('drop',e=>{e.preventDefault();const id=+e.dataTransfer.getData('text/plain');const it=K.find(x=>x.id===id);if(it){it.c=col.dataset.c;saveK();renderK();}});
+  });
+}
+renderK();
+
+/* RICE */
+const R=[
+ {k:"p1",f:"Paiement en plusieurs fois",r:1200,i:2,c:80,e:3},
+ {k:"p1",f:"Programme de fidélité",r:800,i:1,c:50,e:6},
+ {k:"p1",f:"Mode hors ligne",r:300,i:1,c:50,e:5},
+ {k:"p2",f:"Recommande en un clic",r:2000,i:2,c:80,e:2},
+ {k:"p2",f:"Tarifs personnalisés par client",r:600,i:3,c:50,e:5},
+ {k:"p2",f:"Export comptable",r:150,i:2,c:100,e:1},
+ {k:"p3",f:"Relances automatiques d'impayés",r:400,i:3,c:80,e:4},
+ {k:"p3",f:"Tableau de bord de synchronisation",r:20,i:1,c:100,e:2},
+ {k:"p3",f:"Synchronisation en temps réel",r:400,i:1,c:50,e:8}
+];
+let rf="all";
+function renderR(){
+  chips(document.getElementById('rFilters'),rf,v=>{rf=v;renderR()});
+  const rows=R.map((x,idx)=>({...x,idx,s:x.r*x.i*(x.c/100)/x.e})).filter(x=>rf==="all"||x.k===rf).sort((a,b)=>b.s-a.s);
+  const t=document.getElementById('riceT');
+  t.innerHTML=`<tr><th>Rang</th><th>Fonctionnalité</th><th>Projet</th><th class="num">Reach</th><th class="num">Impact</th><th class="num">Confiance %</th><th class="num">Effort</th><th class="num">Score</th></tr>`+
+  rows.map((x,n)=>`<tr><td class="rank">${n+1}</td><td>${x.f}</td><td>${tag(x.k)}</td>
+   ${["r","i","c","e"].map(f=>`<td class="num"><input type="number" min="0" step="${f==='i'?0.25:1}"${f==='i'?' max="3"':f==='c'?' max="100"':''} value="${x[f]}" data-i="${x.idx}" data-f="${f}" aria-label="${f} ${x.f}"></td>`).join('')}
+   <td class="num score">${Math.round(x.s)}</td></tr>`).join('');
+  t.querySelectorAll('input').forEach(inp=>inp.addEventListener('change',()=>{const v=parseFloat(inp.value);if(!isNaN(v)&&v>=0&&!(inp.dataset.f==='e'&&v===0)&&!(inp.dataset.f==='i'&&v>3)&&!(inp.dataset.f==='c'&&v>100)){R[inp.dataset.i][inp.dataset.f]=v;renderR();}}));
+}
+renderR();
+
+/* RAID */
+const RAID=[
+ {ty:"R",k:"p1",d:"Validation tardive des maquettes de paiement par le client",crit:"Élevée",own:"Chef de projet",due:"28/09",st:"Relancé"},
+ {ty:"R",k:"p2",d:"Volumétrie du catalogue sous-estimée (20 000 références annoncées, 60 000 possibles)",crit:"Moyenne",own:"Directeur technique",due:"09/10",st:"À analyser"},
+ {ty:"R",k:"p3",d:"Indisponibilité de l'interlocuteur ERP pendant les congés de la Toussaint",crit:"Moyenne",own:"Chef de projet",due:"16/10",st:"Suppléant demandé"},
+ {ty:"A",k:"p3",d:"Escalader l'accès à l'environnement de test auprès du sponsor",crit:"Élevée",own:"Chef de projet",due:"29/09",st:"Planifié"},
+ {ty:"A",k:"p1",d:"Planifier la recette du lot 2 avec les utilisateurs de l'hôtel",crit:"Moyenne",own:"Chef de projet",due:"02/10",st:"En cours"},
+ {ty:"I",k:"p3",d:"Connecteur clients bloqué : pas d'accès à l'environnement de test",crit:"Élevée",own:"DSI client",due:"22/09",st:"Ouvert",late:1},
+ {ty:"I",k:"p1",d:"Contenus des fiches hôtels incomplets (photos manquantes)",crit:"Faible",own:"Hôtels Lumen",due:"05/10",st:"Ouvert"},
+ {ty:"D",k:"p2",d:"Fichier du catalogue produits fourni par le client",crit:"Élevée",own:"Distrib Nord",due:"02/10",st:"Attendu"},
+ {ty:"D",k:"p1",d:"Contrat du prestataire de paiement signé par le client",crit:"Élevée",own:"Hôtels Lumen",due:"09/10",st:"En signature"}
+];
+const TYN={R:"Risque",A:"Action",I:"Problème",D:"Dépendance"};
+const CR={"Élevée":"s-ko","Moyenne":"s-warn","Faible":"s-ok"};
+let raidF="all";
+function renderRAID(){
+  const el=document.getElementById('raidFilters');
+  const opts=[["all","Tout"],["R","Risques"],["A","Actions"],["I","Problèmes"],["D","Dépendances"]];
+  el.innerHTML=opts.map(o=>`<button class="chip" aria-pressed="${o[0]===raidF}" data-v="${o[0]}">${o[1]} ${o[0]==='all'?'':'('+RAID.filter(x=>x.ty===o[0]).length+')'}</button>`).join('');
+  el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{raidF=b.dataset.v;renderRAID()});
+  document.getElementById('raidT').innerHTML=`<tr><th>Type</th><th>Projet</th><th>Description</th><th>Criticité</th><th>Porteur</th><th>Échéance</th><th>Statut</th></tr>`+
+   RAID.filter(x=>raidF==="all"||x.ty===raidF).map(x=>`<tr><td class="type${x.ty}"><b>${TYN[x.ty]}</b></td><td>${tag(x.k)}</td><td>${x.d}</td><td><span class="crit ${CR[x.crit]}">${x.crit}</span></td><td>${x.own}</td><td class="${x.late?'late-txt':''}">${x.due}${x.late?' (dépassée)':''}</td><td>${x.st}</td></tr>`).join('');
+}
+renderRAID();
+
+/* Attentes client */
+const AT=[
+ {k:"p3",w:"Accès à l'environnement de test de l'ERP",dem:"15/09",bes:"22/09",imp:"Bloque le connecteur clients ; +1 semaine à ce jour",st:"ko",stL:"En retard, escalade"},
+ {k:"p1",w:"Maquettes validées des écrans de paiement",dem:"08/09",bes:"22/09",imp:"Décale la recette du lot 2 de 3 jours",st:"warn",stL:"Reçu partiellement"},
+ {k:"p2",w:"Fichier du catalogue produits (format CSV)",dem:"18/09",bes:"02/10",imp:"Import du catalogue impossible à tester",st:"ok",stL:"Dans les temps"},
+ {k:"p3",w:"Validation du mapping des champs",dem:"24/09",bes:"02/10",imp:"Bloque la synchronisation des factures",st:"ok",stL:"Dans les temps"},
+ {k:"p1",w:"Contrat prestataire de paiement signé",dem:"10/09",bes:"09/10",imp:"Pas de paiement réel possible en production",st:"warn",stL:"Sans nouvelles, relance lundi"},
+ {k:"p2",w:"Validation de la charte graphique",dem:"25/09",bes:"23/10",imp:"Décale la finition des écrans",st:"ok",stL:"Demandé"},
+ {k:"p1",w:"Photos et textes des fiches hôtels",dem:"15/09",bes:"12/10",imp:"Mise en service possible avec contenus provisoires",st:"ok",stL:"En cours côté client"}
+];
+document.getElementById('attT').innerHTML=`<tr><th>Projet</th><th>Élément attendu</th><th>Demandé le</th><th>Nécessaire le</th><th>Impact si retard</th><th>Statut</th></tr>`+
+ AT.map(x=>`<tr><td>${tag(x.k)}</td><td>${x.w}</td><td>${x.dem}</td><td><b>${x.bes}</b></td><td>${x.imp}</td><td><span class="status s-${x.st}">${x.stL}</span></td></tr>`).join('');
+
+/* Incidents */
+const INC=[
+ {id:"INC-031",k:"p1",sev:1,date:"24/09 19:40",t:"Paiement refusé pour toutes les cartes en préproduction ouverte au client",imp:"Tests d'acceptation du client bloqués la veille d'une démo",st:"Résolu",tech:"Directeur technique",res:"3 h 10",sla:"4 h",ok:1,pm:"Planifiée 29/09",
+  tl:[["19:40","Supervision","Alerte : taux d'échec des paiements à 100 %"],["19:55","Chef de projet","Qualifié P1 avec le directeur technique ; ticket ouvert"],["20:05","Chef de projet","Message au client : incident identifié, prochain point à 21 h"],["21:00","Chef de projet","Point d'étape au client : clé du prestataire de paiement expirée"],["22:50","Équipe technique","Clé renouvelée, paiements rétablis et vérifiés"],["23:00","Chef de projet","Message de clôture, revue post-incident proposée le 29/09"]]},
+ {id:"INC-030",k:"p3",sev:2,date:"23/09 10:15",t:"Synchronisation des clients interrompue après une mise à jour de l'ERP",imp:"Nouveaux clients absents de l'outil de facturation",st:"En cours",tech:"Dév. back",res:"—",sla:"1 j ouvré",ok:0,pm:"À planifier",
+  tl:[["10:15","Client","Signalement par la DSI : 12 fiches clients manquantes"],["10:40","Chef de projet","Qualifié P2 ; contournement : saisie manuelle proposée"],["11:30","Équipe technique","Cause probable : champ renommé par l'éditeur de l'ERP"],["16:00","Chef de projet","Point au client ; correctif bloqué par l'absence d'environnement de test"],["24/09","Chef de projet","Délai dépassé, relié au problème ouvert dans le RAID ; escalade prévue"]]},
+ {id:"INC-029",k:"p2",sev:3,date:"21/09 14:02",t:"Tri par date inversé dans l'historique des commandes",imp:"Gêne à la lecture, aucune donnée erronée",st:"Résolu",tech:"Dév. front",res:"2 j",sla:"Prochaine livraison",ok:1,pm:"Non requise",
+  tl:[["21/09","Client","Signalé pendant la démo hebdomadaire"],["21/09","Chef de projet","Qualifié P3, ajouté à l'itération en cours"],["23/09","Équipe technique","Corrigé dans la livraison du mercredi"],["24/09","Chef de projet","Confirmé au client au point hebdo"]]},
+ {id:"INC-028",k:"p1",sev:2,date:"16/09 08:30",t:"Emails de confirmation de réservation non envoyés",imp:"Clients des hôtels sans confirmation pendant 6 h",st:"Clos",tech:"Dév. back",res:"6 h",sla:"1 j ouvré",ok:1,pm:"Faite 18/09 · 2 actions",
+  tl:[["08:30","Client","Réclamations reçues par la réception de l'hôtel"],["08:45","Chef de projet","Qualifié P2 ; message au client"],["12:10","Équipe technique","Quota du service d'envoi dépassé ; offre augmentée"],["14:30","Chef de projet","Clôture ; renvoi des confirmations manquantes confirmé"],["18/09","Chef de projet","Revue post-incident : alerte sur le quota ajoutée, vérification avant chaque mise en service"]]},
+ {id:"INC-027",k:"p2",sev:4,date:"14/09 11:00",t:"Libellé tronqué sur le bouton « Commander » en mobile",imp:"Cosmétique",st:"Backlog",tech:"—",res:"—",sla:"Selon priorité",ok:1,pm:"Non requise",
+  tl:[["14/09","Client","Remarque par email"],["14/09","Chef de projet","Qualifié P4, ajouté au backlog"]]}
+];
+const SEVL={1:"P1 bloquant",2:"P2 majeur",3:"P3 mineur",4:"P4 cosmétique"};
+const STC={"En cours":"s-ko","Résolu":"s-ok","Clos":"s-ok","Backlog":"s-warn"};
+let incF="open", incSel="INC-030";
+function renderInc(){
+  const open=INC.filter(x=>x.st==="En cours").length;
+  const p12=INC.filter(x=>x.sev<=2);
+  const slaOk=p12.filter(x=>x.ok).length;
+  const pmTodo=INC.filter(x=>x.sev<=2&&!/Faite/.test(x.pm)).length;
+  document.getElementById('incKpi').innerHTML=[
+   [open,"incident ouvert","incidents ouverts"],
+   [`${slaOk} / ${p12.length}`,"P1-P2 dans les délais","P1-P2 dans les délais"],
+   ["4 h 50","temps moyen de rétablissement P1-P2 (30 j)"],
+   [pmTodo,"revue post-incident à mener","revues post-incident à mener"]
+  ].map(k=>`<div class="box"><div class="v">${k[0]}</div><div class="l">${k[2]&&k[0]!==1?k[2]:k[1]}</div></div>`).join('');
+
+  const fe=document.getElementById('incFilters');
+  const opts=[["open","À traiter"],["all","Tous"],...Object.keys(P).map(k=>[k,P[k].name])];
+  fe.innerHTML=opts.map(o=>`<button class="chip" aria-pressed="${o[0]===incF}" data-v="${o[0]}">${o[1]}</button>`).join('');
+  fe.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{incF=b.dataset.v;renderInc()});
+
+  const rows=INC.filter(x=>incF==="all"||(incF==="open"?(x.st==="En cours"||(x.sev<=2&&!/Faite/.test(x.pm))):x.k===incF));
+  document.getElementById('incT').innerHTML=`<tr><th>Réf.</th><th>Gravité</th><th>Projet</th><th>Incident</th><th>Impact client</th><th>Ouvert le</th><th>Statut</th><th>Délai</th><th>Revue</th></tr>`+
+   (rows.length?rows.map(x=>`<tr class="row ${x.id===incSel?'sel':''}" data-id="${x.id}" tabindex="0"><td><b>${x.id}</b></td><td><span class="crit sev${x.sev}">${SEVL[x.sev]}</span></td><td>${tag(x.k)}</td><td>${x.t}</td><td>${x.imp}</td><td>${x.date}</td><td><span class="status ${STC[x.st]}">${x.st}</span></td><td class="${x.ok?'sla-ok':'sla-ko'}">${x.res==='—'?(x.ok?'—':'Dépassé'):x.res} <span style="font-weight:400;color:var(--ink-2)">/ ${x.sla}</span></td><td>${x.pm}</td></tr>`).join('')
+   :`<tr><td colspan="9">Aucun incident dans ce filtre.</td></tr>`);
+  document.querySelectorAll('#incT tr.row').forEach(r=>{
+    const go=()=>{incSel=r.dataset.id;renderInc()};
+    r.onclick=go; r.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}};
+  });
+  const x=INC.find(i=>i.id===incSel);
+  document.getElementById('incDetail').innerHTML=x?`<h3>${x.id} : ${x.t}</h3>
+   <dl class="kv"><dt>Projet</dt><dd>${P[x.k].name} (${P[x.k].client})</dd><dt>Gravité</dt><dd>${SEVL[x.sev]}</dd><dt>Traitement technique</dt><dd>${x.tech}</dd><dt>Revue post-incident</dt><dd>${x.pm}</dd></dl>
+   <h3 style="margin-top:14px">Chronologie et communication</h3>
+   <ul class="tl">${x.tl.map(t=>`<li><span>${t[0]}</span><span class="who">${t[1]}</span><span>${t[2]}</span></li>`).join('')}</ul>`
+   :`<p class="intro" style="margin:0">Sélectionnez un incident pour afficher sa chronologie.</p>`;
+}
+renderInc();
+
+/* DORA */
+const D={
+ p1:{df:[2,3,2,4,3,3,4,3],lt:[3.5,3,2.8,2.5,3,2.6,2.4,2.2],cf:[12,10,15,8,10,9,7,8],mt:[5,4,6,3,3,2.5,3,2]},
+ p2:{df:[1,2,2,2,3,3,3,4],lt:[4,4,3.5,3.2,3,3,2.8,2.5],cf:[0,10,5,5,8,6,5,4],mt:[0,2,3,2,2,1.5,1.5,1]},
+ p3:{df:[1,1,2,1,1,2,1,1],lt:[5,5.5,5,6,6.5,6,7,7.5],cf:[20,15,18,25,20,22,25,20],mt:[8,6,9,10,8,12,10,11]}
+};
+let dfSel="all";
+const avgSeries=key=>D.p1[key].map((_,i)=>(D.p1[key][i]+D.p2[key][i]+D.p3[key][i])/(key==="df"?1:3));
+function spark(vals,good){
+  const mx=Math.max(...vals)||1,mn=Math.min(...vals),w=240,h=46,st=w/(vals.length-1);
+  const pts=vals.map((v,i)=>`${(i*st).toFixed(1)},${(h-4-((v-mn)/((mx-mn)||1))*(h-8)).toFixed(1)}`).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="${good?'var(--ok)':'var(--ko)'}" stroke-width="2" points="${pts}"/></svg>`;
+}
+function renderD(){
+  chips(document.getElementById('dFilters'),dfSel,v=>{dfSel=v;renderD()});
+  const s=k=>dfSel==="all"?avgSeries(k):D[dfSel][k];
+  const M=[
+   {k:"df",n:"Fréquence de déploiement",u:" / sem.",higher:1,lvl:v=>v>=5?"Élite":v>=1?"Élevé":"Moyen"},
+   {k:"lt",n:"Délai de mise en production",u:" jours",higher:0,lvl:v=>v<1?"Élite":v<7?"Élevé":"Moyen"},
+   {k:"cf",n:"Taux d'échec des changements",u:" %",higher:0,lvl:v=>v<=5?"Élite":v<=15?"Élevé":"Moyen"},
+   {k:"mt",n:"Temps de rétablissement",u:" h",higher:0,lvl:v=>v<1?"Élite":v<24?"Élevé":"Moyen"}
+  ];
+  document.getElementById('doraCards').innerHTML=M.map(m=>{
+    const v=s(m.k),last=v[v.length-1],first=v[0];
+    const good=m.higher?last>=first:last<=first;
+    const fmt=x=>(Math.round(x*10)/10).toString().replace('.',',');
+    return `<div class="box metric"><h3>${m.n}</h3><div class="val">${fmt(last)}${m.u}</div>
+    <div class="lvl">Niveau ${m.lvl(last)} · ${good?'en amélioration':'en dégradation'} sur 8 semaines</div>${spark(v,good)}</div>`;
+  }).join('');
+}
+renderD();
+</script>
+</body>
+</html>
