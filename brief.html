@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Proposition de collaboration – Breathe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;background:#0E131B;overflow:hidden;font-family:'Instrument Sans',Helvetica,Arial,sans-serif}
+#stage{position:absolute;inset:0;bottom:72px;display:grid;place-items:center;overflow:hidden}
+#deck{position:relative;width:1920px;height:1080px;flex:none;transform-origin:center center;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden;opacity:0;visibility:hidden;transition:opacity .35s ease}
+.slide.on{opacity:1;visibility:visible}
+.slide *{box-sizing:border-box}
+.slide h1,.slide h2,.slide h3,.slide p,.slide ul{margin:0}
+.slide ul{padding-left:1.1em}
+.slide li{margin:0}
+nav{position:fixed;left:0;right:0;bottom:0;height:calc(72px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);display:flex;align-items:center;justify-content:center;gap:14px;color:#C9D1DB;font-size:15px;flex-wrap:wrap}
+nav button{font:inherit;background:#1F2835;color:#E8ECF2;border:1px solid #334055;border-radius:8px;padding:8px 14px;cursor:pointer}
+nav button:disabled{opacity:.35;cursor:default}
+nav button:focus-visible{outline:2px solid #5CC4C8;outline-offset:2px}
+#count{min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{height:auto;overflow:visible;background:#fff}
+  nav{display:none}
+  #stage{position:static;display:block}
+  #deck{transform:none!important;width:1920px;height:auto;box-shadow:none}
+  .slide{position:relative;opacity:1;visibility:visible;break-after:page}
+}
+@media (prefers-reduced-motion:reduce){.slide{transition:none}}
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck">
+<section class="slide" id="cover" data-transition="fade" style="background:#1B2433; color:#F3F5F7; font-family:'Instrument Sans', Helvetica, Arial, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:flex-end; gap:32px">
+<div class="shape" style="position:absolute; left:128px; top:128px; width:120px; height:8px; background:#5CC4C8"></div>
+<p style="font-size:28px; font-weight:600; color:#5CC4C8; letter-spacing:2px">PROPOSITION DE COLLABORATION</p>
+<h1 style="font-size:104px; font-weight:700; line-height:1.05; width:1400px">Chef de projet aux côtés de Paul</h1>
+<p style="font-size:36px; color:#B8C2CE">Breathe · Florian [Nom] · [date]</p>
+
+</section>
+<section class="slide" id="constat" data-transition="fade" style="background:#F3F5F7; color:#1B2433; font-family:'Instrument Sans', Helvetica, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:72px">
+<h2 style="font-size:64px; font-weight:700; line-height:1.1">Ce que j'ai retenu de l'échange avec Paul</h2>
+<div style="display:flex; gap:32px">
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#FFFFFF; padding:48px; border-radius:16px; border-top:8px solid #0E6E72">
+<p style="font-size:28px; font-weight:700; color:#0E6E72">01</p>
+<h3 style="font-size:36px; font-weight:700; line-height:1.2">Un profil technique solide</h3>
+<p style="font-size:28px; line-height:1.4; color:#4A5568">Une vraie maîtrise, qui se ressent tout de suite dans l'échange.</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#FFFFFF; padding:48px; border-radius:16px; border-top:8px solid #C4671A">
+<p style="font-size:28px; font-weight:700; color:#A5530F">02</p>
+<h3 style="font-size:36px; font-weight:700; line-height:1.2">Une charge non technique trop lourde</h3>
+<p style="font-size:28px; line-height:1.4; color:#4A5568">Suivi des fonctionnalités, relation client et communication prennent le temps de la technique.</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#FFFFFF; padding:48px; border-radius:16px; border-top:8px solid #1B2433">
+<p style="font-size:28px; font-weight:700; color:#1B2433">03</p>
+<h3 style="font-size:36px; font-weight:700; line-height:1.2">Un produit en construction</h3>
+<p style="font-size:28px; line-height:1.4; color:#4A5568">Des choix et des méthodes qui évoluent en chemin, ce qui est normal à ce stade.</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#6A7584">Breathe · Proposition de collaboration</p>
+
+</section>
+<section class="slide" id="roles" data-transition="fade" style="background:#F3F5F7; color:#1B2433; font-family:'Instrument Sans', Helvetica, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:64px">
+<h2 style="font-size:64px; font-weight:700; line-height:1.1">Un partage clair des rôles</h2>
+<div style="display:flex; gap:32px">
+<div style="flex:1; display:flex; flex-direction:column; gap:28px; background:#E3E8EE; padding:56px; border-radius:16px">
+<p style="font-size:28px; font-weight:600; color:#4A5568">Paul</p>
+<h3 style="font-size:44px; font-weight:700">La technique</h3>
+<ul style="font-size:30px; line-height:1.5; color:#2D3748">
+<li>Architecture et choix techniques</li>
+<li>Outils et organisation du développement</li>
+<li>Développement et mises en production</li>
+</ul>
+</div>
+<div style="flex:1.25; display:flex; flex-direction:column; gap:28px; background:#0E6E72; color:#F3F5F7; padding:56px; border-radius:16px">
+<p style="font-size:28px; font-weight:600; color:#BFE6E7">Florian</p>
+<h3 style="font-size:44px; font-weight:700">Tout le reste</h3>
+<ul style="font-size:30px; line-height:1.5">
+<li>Planning et suivi des trois projets</li>
+<li>Retards anticipés et signalés tôt</li>
+<li>Points réguliers avec les clients</li>
+<li>Obtenir des clients ce qu'il faut, au bon moment</li>
+<li>Communication régulière sur l'avancement</li>
+</ul>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#6A7584">Breathe · Proposition de collaboration</p>
+
+</section>
+<section class="slide" id="reprise" data-transition="fade" style="background:#F3F5F7; color:#1B2433; font-family:'Instrument Sans', Helvetica, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:56px">
+<h2 style="font-size:64px; font-weight:700; line-height:1.1">Plan de reprise du projet en retard</h2>
+<div style="display:flex; gap:32px">
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#FFFFFF; padding:48px; border-radius:16px; border-top:8px solid #A5530F">
+<p style="font-size:28px; font-weight:700; color:#A5530F">SEMAINES 1 ET 2</p>
+<h3 style="font-size:36px; font-weight:700">Diagnostic</h3>
+<ul style="font-size:28px; line-height:1.45; color:#2D3748">
+<li>Écart réel mesuré avec Paul</li>
+<li>Causes du retard identifiées</li>
+<li>Blocages côté client listés</li>
+</ul>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#FFFFFF; padding:48px; border-radius:16px; border-top:8px solid #A5530F">
+<p style="font-size:28px; font-weight:700; color:#A5530F">SEMAINES 3 ET 4</p>
+<h3 style="font-size:36px; font-weight:700">Replanification</h3>
+<ul style="font-size:28px; line-height:1.45; color:#2D3748">
+<li>Périmètre recentré avec le client</li>
+<li>Nouveau planning réaliste</li>
+<li>Validé par Géraud et le client</li>
+</ul>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#FFFFFF; padding:48px; border-radius:16px; border-top:8px solid #0E6E72">
+<p style="font-size:28px; font-weight:700; color:#0E6E72">DÈS LA SEMAINE 5</p>
+<h3 style="font-size:36px; font-weight:700">Pilotage</h3>
+<ul style="font-size:28px; line-height:1.45; color:#2D3748">
+<li>Point client chaque semaine</li>
+<li>Éléments attendus suivis</li>
+<li>Alerte dès le premier écart</li>
+</ul>
+</div>
+</div>
+<div style="display:flex; gap:24px; align-items:center; background:#1B2433; color:#F3F5F7; padding:32px 48px; border-radius:16px">
+<p style="font-size:28px; font-weight:700; color:#5CC4C8">OBJECTIF</p>
+<p style="font-size:28px">Tenir la nouvelle date de mise en service, [date], avec un client informé chaque semaine.</p>
+</div>
+<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#6A7584">Breathe · Proposition de collaboration</p>
+
+</section>
+<section class="slide" id="portefeuille" data-transition="fade" style="background:#F3F5F7; color:#1B2433; font-family:'Instrument Sans', Helvetica, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:40px">
+<h2 style="font-size:64px; font-weight:700; line-height:1.1">Trois projets, une seule équipe technique</h2>
+<div style="display:flex; flex-direction:column; gap:16px">
+<div style="display:flex; gap:24px; align-items:center">
+<div style="width:400px"><p style="font-size:24px; color:#6A7584">Semaines après le démarrage</p></div>
+<div style="flex:1; display:flex">
+<p style="flex:1; font-size:24px; color:#6A7584">S1</p><p style="flex:1; font-size:24px; color:#6A7584">S2</p><p style="flex:1; font-size:24px; color:#6A7584">S3</p><p style="flex:1; font-size:24px; color:#6A7584">S4</p><p style="flex:1; font-size:24px; color:#6A7584">S5</p><p style="flex:1; font-size:24px; color:#6A7584">S6</p><p style="flex:1; font-size:24px; color:#6A7584">S7</p><p style="flex:1; font-size:24px; color:#6A7584">S8</p><p style="flex:1; font-size:24px; color:#6A7584">S9</p><p style="flex:1; font-size:24px; color:#6A7584">S10</p><p style="flex:1; font-size:24px; color:#6A7584">S11</p><p style="flex:1; font-size:24px; color:#6A7584">S12</p>
+</div>
+</div>
+<div style="display:flex; gap:24px; align-items:center; background:#FFFFFF; padding:28px 24px; border-radius:12px">
+<div style="width:376px; display:flex; flex-direction:column; gap:4px">
+<h3 style="font-size:32px; font-weight:700">[Projet en retard]</h3>
+<p style="font-size:24px; font-weight:700; color:#A5530F">Remettre sur les rails</p>
+</div>
+<div style="flex:1; display:flex; gap:6px; align-items:center">
+<div style="flex:2; background:#A5530F; color:#FFFFFF; padding:14px 12px; border-radius:8px"><p style="font-size:24px; font-weight:600">Diagnostic</p></div>
+<div style="flex:2; background:#A5530F; color:#FFFFFF; padding:14px 12px; border-radius:8px"><p style="font-size:24px; font-weight:600">Replanifier</p></div>
+<div style="flex:6; background:#0E6E72; color:#FFFFFF; padding:14px 12px; border-radius:8px"><p style="font-size:24px; font-weight:600">Pilotage renforcé</p></div>
+<div style="flex:2; display:flex; gap:10px; align-items:center"><div class="shape" style="clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);flex:none;width:32px; height:32px; background:#1B2433"></div><p style="font-size:24px; font-weight:600">Livraison</p></div>
+</div>
+</div>
+<div style="display:flex; gap:24px; align-items:center; background:#FFFFFF; padding:28px 24px; border-radius:12px">
+<div style="width:376px; display:flex; flex-direction:column; gap:4px">
+<h3 style="font-size:32px; font-weight:700">[Projet en cours]</h3>
+<p style="font-size:24px; font-weight:700; color:#0E6E72">Sécuriser le rythme</p>
+</div>
+<div style="flex:1; display:flex; gap:6px; align-items:center">
+<div style="flex:12; background:#0E6E72; color:#FFFFFF; padding:14px 12px; border-radius:8px"><p style="font-size:24px; font-weight:600">Suivi hebdomadaire et points clients, sans détourner Paul du projet en retard</p></div>
+</div>
+</div>
+<div style="display:flex; gap:24px; align-items:center; background:#FFFFFF; padding:28px 24px; border-radius:12px">
+<div style="width:376px; display:flex; flex-direction:column; gap:4px">
+<h3 style="font-size:32px; font-weight:700">[Futur projet]</h3>
+<p style="font-size:24px; font-weight:700; color:#4A5568">Préparer le terrain</p>
+</div>
+<div style="flex:1; display:flex; gap:6px; align-items:center">
+<div style="flex:4"></div>
+<div style="flex:4; background:#4A5568; color:#FFFFFF; padding:14px 12px; border-radius:8px"><p style="font-size:24px; font-weight:600">Cadrage et besoins client</p></div>
+<div style="flex:2; background:#4A5568; color:#FFFFFF; padding:14px 12px; border-radius:8px"><p style="font-size:24px; font-weight:600">Planning</p></div>
+<div style="flex:2; display:flex; gap:10px; align-items:center"><div class="shape" style="clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);flex:none;width:32px; height:32px; background:#1B2433"></div><p style="font-size:24px; font-weight:600">Lancement</p></div>
+</div>
+</div>
+</div>
+<p style="font-size:28px; line-height:1.45; color:#2D3748; width:1600px">Le futur projet se prépare côté client pendant que Paul reste concentré sur les deux projets en cours. Son lancement n'arrive qu'une fois la reprise stabilisée.</p>
+<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#6A7584">Breathe · Proposition de collaboration</p>
+
+</section>
+<section class="slide" id="demarrage" data-transition="fade" style="background:#F3F5F7; color:#1B2433; font-family:'Instrument Sans', Helvetica, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:64px">
+<h2 style="font-size:64px; font-weight:700; line-height:1.1">Trois premiers mois pour installer le rythme</h2>
+<div style="display:flex; gap:24px; align-items:stretch">
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#FFFFFF; padding:48px; border-radius:16px">
+<p style="font-size:28px; font-weight:700; color:#0E6E72">MOIS 1</p>
+<h3 style="font-size:36px; font-weight:700">Prise en main</h3>
+<p style="font-size:28px; line-height:1.45; color:#4A5568">Reprise des trois projets, planning consolidé, premiers points clients.</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#FFFFFF; padding:48px; border-radius:16px">
+<p style="font-size:28px; font-weight:700; color:#0E6E72">MOIS 2</p>
+<h3 style="font-size:36px; font-weight:700">Rythme de croisière</h3>
+<p style="font-size:28px; line-height:1.45; color:#4A5568">Points clients réguliers, suivi des attentes client, alertes anticipées.</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; background:#1B2433; color:#F3F5F7; padding:48px; border-radius:16px">
+<p style="font-size:28px; font-weight:700; color:#5CC4C8">MOIS 3</p>
+<h3 style="font-size:36px; font-weight:700">Bilan</h3>
+<p style="font-size:28px; line-height:1.45; color:#C9D1DB">Point avec Géraud et Paul, ajustement du périmètre, décision de reconduction.</p>
+</div>
+</div>
+<p style="font-size:28px; color:#4A5568"><b style="color:#1B2433">Point à mi-parcours</b> après six semaines, pour ajuster si besoin.</p>
+<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#6A7584">Breathe · Proposition de collaboration</p>
+
+</section>
+<section class="slide" id="formules" data-transition="fade" style="background:#F3F5F7; color:#1B2433; font-family:'Instrument Sans', Helvetica, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:56px">
+<h2 style="font-size:64px; font-weight:700; line-height:1.1">Deux formules au choix</h2>
+<div style="display:flex; gap:32px">
+<div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#FFFFFF; padding:56px; border-radius:16px; border:2px solid #D5DAE2">
+<p style="font-size:28px; font-weight:600; color:#4A5568">Sans engagement</p>
+<p style="font-size:96px; font-weight:700; line-height:1.05">800 €<span style="font-size:36px; font-weight:500; color:#4A5568"> HT / jour</span></p>
+<p style="font-size:30px; line-height:1.45; color:#2D3748">Forfait de 4 jours par mois : <b>3 200 € HT</b><br>Préavis de 15 jours</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:16px; background:#0E6E72; color:#F3F5F7; padding:56px; border-radius:16px">
+<p style="font-size:28px; font-weight:600; color:#BFE6E7">Engagement de 3 mois</p>
+<p style="font-size:96px; font-weight:700; line-height:1.05">750 €<span style="font-size:36px; font-weight:500; color:#BFE6E7"> HT / jour</span></p>
+<p style="font-size:30px; line-height:1.45">Forfait de 4 jours par mois : <b>3 000 € HT</b><br>Point à mi-parcours, puis reconduction</p>
+</div>
+</div>
+<p style="font-size:28px; line-height:1.45; color:#4A5568; width:1500px">Dans les deux cas : travail à distance, réparti sur plusieurs créneaux. Jours supplémentaires lors des mises en service, validés à l'avance, au même tarif.</p>
+<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#6A7584">Breathe · Proposition de collaboration</p>
+
+</section>
+<section class="slide" id="suite" data-transition="fade" style="background:#1B2433; color:#F3F5F7; font-family:'Instrument Sans', Helvetica, Arial, sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:72px">
+<h2 style="font-size:64px; font-weight:700; line-height:1.1">Prochaines étapes</h2>
+<div style="display:flex; gap:32px">
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; border-top:4px solid #5CC4C8; padding:40px 0 0 0">
+<p style="font-size:72px; font-weight:700; color:#5CC4C8">1</p>
+<h3 style="font-size:36px; font-weight:700; line-height:1.25">Valider le périmètre et la formule</h3>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; border-top:4px solid #5CC4C8; padding:40px 0 0 0">
+<p style="font-size:72px; font-weight:700; color:#5CC4C8">2</p>
+<h3 style="font-size:36px; font-weight:700; line-height:1.25">Point de lancement avec Paul</h3>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:20px; border-top:4px solid #5CC4C8; padding:40px 0 0 0">
+<p style="font-size:72px; font-weight:700; color:#5CC4C8">3</p>
+<h3 style="font-size:36px; font-weight:700; line-height:1.25">Démarrage le [date]</h3>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:64px; width:1664px; font-size:24px; color:#9AA6B5">Breathe · Proposition de collaboration</p>
+
+</section>
+</div></div>
+<nav aria-label="Navigation">
+<button id="prev" aria-label="Diapositive précédente">← Précédent</button>
+<span id="count" aria-live="polite"></span>
+<button id="next" aria-label="Diapositive suivante">Suivant →</button>
+<button id="fs">Plein écran</button>
+</nav>
+<script>
+const S=[...document.querySelectorAll('.slide')], deck=document.getElementById('deck'), stage=document.getElementById('stage');
+let i=Math.max(0,Math.min(S.length-1,(parseInt(location.hash.slice(1))||1)-1));
+function fit(){const sc=Math.min(stage.clientWidth/1920,stage.clientHeight/1080)*0.96;deck.style.transform='scale('+sc+')';}
+function show(n){i=Math.max(0,Math.min(S.length-1,n));S.forEach((s,k)=>{s.classList.toggle('on',k===i);s.setAttribute('aria-hidden',k!==i);});
+ document.getElementById('count').textContent=(i+1)+' / '+S.length;
+ document.getElementById('prev').disabled=i===0;document.getElementById('next').disabled=i===S.length-1;
+ try{history.replaceState(null,'','#'+(i+1));}catch(e){}}
+document.getElementById('prev').onclick=()=>show(i-1);
+document.getElementById('next').onclick=()=>show(i+1);
+const fsb=document.getElementById('fs');
+if(!document.documentElement.requestFullscreen)fsb.style.display='none';
+fsb.onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();};
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(i+1)}else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(i-1)}else if(e.key==='Home')show(0);else if(e.key==='End')show(S.length-1);});
+let x0=null;addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
+addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)show(i+(dx<0?1:-1));x0=null;});
+addEventListener('resize',fit);fit();show(i);
+</script>
+</body>
+</html>
