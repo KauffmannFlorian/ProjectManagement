@@ -118,11 +118,23 @@ td input{width:62px;font:inherit;font-size:.85rem;padding:3px 5px;border:1px sol
 .late-txt{color:var(--ko);font-weight:600}
 
 /* DORA */
-.dora{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:18px}
-.metric .val{font-size:1.6rem;font-weight:700;line-height:1.1}
-.metric .lvl{font-size:.8rem;color:var(--ink-2)}
-.metric svg{width:100%;height:46px;display:block;margin-top:8px}
+.dcmp th.proj{min-width:190px}
+.dcmp td{vertical-align:top}
+.dcmp .mname{font-weight:600}
+.dcmp .msub{display:block;font-weight:400;font-size:.78rem;color:var(--ink-2)}
+.dcmp .val{font-size:1.25rem;font-weight:700;line-height:1.2}
+.dcmp .lvl{margin-left:6px;vertical-align:3px}
+.dcmp .dl{display:block;font-size:.78rem;margin-top:2px}
+.d-good{color:var(--ok)} .d-bad{color:var(--ko)} .d-flat{color:var(--ink-2)}
+.dcmp tr.samp td{font-size:.8rem;color:var(--ink-2);background:var(--surface-2)}
+.dfoot{font-size:.85rem;color:var(--ink-2);margin:10px 0 0;max-width:80ch}
+.dchart svg{width:100%;height:auto;display:block}
+.dleg{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--ink-2);margin-top:6px}
+.dleg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 .note{font-size:.88rem;color:var(--ink-2);border-left:3px solid var(--p2);padding:8px 12px;background:var(--surface);max-width:80ch}
+table.bands th,table.bands td{padding:6px 8px;font-size:.8rem}
+.defs{margin:0;padding-left:18px;font-size:.88rem}
+.defs li{margin:5px 0}
 
 /* Incidents */
 .inc-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
@@ -300,10 +312,55 @@ footer{margin-top:40px;font-size:.8rem;color:var(--ink-2)}
 
 <!-- DORA -->
 <section class="panel" id="dora">
-  <p class="intro">The four DORA metrics measure the health of the delivery pipeline over eight weeks. Filter by project:</p>
+  <p class="intro">DORA describes software delivery performance with <b>five metrics</b>: deployment frequency, lead time for changes, change failure rate, failed deployment recovery time and deployment rework rate. Here they are computed from a <b>deployment log</b>, <b>per project</b> (averaging different projects hides more than it shows), over the last four weeks and compared with the four weeks before.</p>
+  <div class="scroll"><table class="dcmp" id="doraCmp"></table></div>
+  <p class="dfoot" id="doraFoot"></p>
+
+  <h3 style="margin-top:24px">Project detail</h3>
   <div class="filters" id="dFilters"></div>
-  <div class="dora" id="doraCards"></div>
-  <p class="note">These metrics come from the tooling chosen by the tech lead. The project manager tracks them and links them to delivery commitments, without deciding the engineering practices that move them.</p>
+  <div class="two">
+    <div class="box dchart">
+      <h3>Deployments per week</h3>
+      <div id="dBars"></div>
+      <div class="dleg" id="dLeg"></div>
+    </div>
+    <div class="box dchart">
+      <h3>Lead time of each deployment (days)</h3>
+      <div id="dLead"></div>
+      <div class="dleg"><span>Dashed line: median over 8 weeks</span></div>
+    </div>
+  </div>
+  <div class="box" style="margin-top:16px">
+    <h3>Deployment log (latest 12)</h3>
+    <div class="scroll" style="border:0"><table id="dLog"></table></div>
+  </div>
+
+  <div class="two" style="margin-top:16px">
+    <div class="box">
+      <h3>How each metric is computed</h3>
+      <ul class="defs">
+        <li><b>Deployment frequency:</b> production deployments per week, corrective ones included.</li>
+        <li><b>Lead time for changes:</b> from first commit to running in production. The median is used, not the mean, because a few slow changes would distort it.</li>
+        <li><b>Change failure rate:</b> deployments that needed a rollback, a hotfix or an incident fix, divided by all deployments.</li>
+        <li><b>Failed deployment recovery time:</b> from the failing deployment to the corrective deployment. Median over failed deployments.</li>
+        <li><b>Deployment rework rate:</b> unplanned corrective deployments divided by all deployments. Newer metric, no established benchmark.</li>
+      </ul>
+      <p style="font-size:.8rem;color:var(--ink-2);margin:10px 0 0">Data sources in practice: deployment timestamps from the CI/CD tool, first-commit time from the repository, failure flag from rollbacks or incident tickets. The tech lead owns this tooling.</p>
+    </div>
+    <div class="box">
+      <h3>Reference bands</h3>
+      <div class="scroll" style="border:0"><table class="bands">
+        <tr><th>Metric</th><th>Elite</th><th>High</th><th>Medium</th><th>Low</th></tr>
+        <tr><td>Deployment frequency</td><td>≥ 5 / week</td><td>≥ 1 / week</td><td>≥ 1 / month</td><td>&lt; 1 / month</td></tr>
+        <tr><td>Lead time</td><td>&lt; 1 day</td><td>&lt; 1 week</td><td>&lt; 1 month</td><td>≥ 1 month</td></tr>
+        <tr><td>Change failure rate</td><td>≤ 5%</td><td>≤ 10%</td><td>≤ 30%</td><td>&gt; 30%</td></tr>
+        <tr><td>Recovery time</td><td>&lt; 1 hour</td><td>&lt; 1 day</td><td>&lt; 1 week</td><td>≥ 1 week</td></tr>
+      </table></div>
+      <p style="font-size:.8rem;color:var(--ink-2);margin:10px 0 0">Indicative bands compiled from DORA research and common practice. Sources differ on the exact cut-offs, so treat them as reference points and watch your own trend.</p>
+    </div>
+  </div>
+
+  <p class="note" style="margin-top:16px">These metrics come from tooling chosen by the tech lead. The project manager tracks them and links them to delivery commitments, without deciding the engineering practices that move them. Use them to spot friction, not to rank people or set targets: a target turns a metric into a game.</p>
 </section>
 
 <!-- CLIENT MEETING -->
@@ -642,35 +699,131 @@ function renderInc(){
 }
 renderInc();
 
-/* DORA */
-const D={
- p1:{df:[2,3,2,4,3,3,4,3],lt:[3.5,3,2.8,2.5,3,2.6,2.4,2.2],cf:[12,10,15,8,10,9,7,8],mt:[5,4,6,3,3,2.5,3,2]},
- p2:{df:[1,2,2,2,3,3,3,4],lt:[4,4,3.5,3.2,3,3,2.8,2.5],cf:[0,10,5,5,8,6,5,4],mt:[0,2,3,2,2,1.5,1.5,1]},
- p3:{df:[1,1,2,1,1,2,1,1],lt:[5,5.5,5,6,6.5,6,7,7.5],cf:[20,15,18,25,20,22,25,20],mt:[8,6,9,10,8,12,10,11]}
+/* DORA: computed from a deployment log */
+const DW0=Date.UTC(2026,7,3), DAY=864e5, HR=36e5, DWEEKS=8, DW_FIRST=32;
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+/* Per project: deployments per week, typical lead time (hours) per week, failure probability, typical recovery (minutes) */
+const DP={
+ p1:{n:[3,3,4,3,4,4,3,4],lt:[40,38,36,34,32,30,30,28],fail:.09,rec:240,seed:21},
+ p2:{n:[1,2,2,2,3,3,3,4],lt:[72,66,60,56,50,46,44,40],fail:.07,rec:150,seed:7},
+ p3:{n:[1,1,2,1,1,2,1,1],lt:[190,200,210,230,250,240,260,270],fail:.3,rec:2000,seed:5}
 };
-let dfSel="all";
-const avgSeries=key=>D.p1[key].map((_,i)=>(D.p1[key][i]+D.p2[key][i]+D.p3[key][i])/(key==="df"?1:3));
-function spark(vals,good){
-  const mx=Math.max(...vals)||1,mn=Math.min(...vals),w=240,h=46,st=w/(vals.length-1);
-  const pts=vals.map((v,i)=>`${(i*st).toFixed(1)},${(h-4-((v-mn)/((mx-mn)||1))*(h-8)).toFixed(1)}`).join(' ');
-  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><polyline fill="none" stroke="${good?'var(--ok)':'var(--ko)'}" stroke-width="2" points="${pts}"/></svg>`;
+const DEPLOYS=(function(){
+  const out=[];
+  Object.keys(DP).forEach(k=>{
+    const c=DP[k], r=rng(c.seed);
+    c.n.forEach((n,w)=>{
+      for(let i=0;i<n;i++){
+        const day=[0,1,1,2,2,3,3,4][Math.floor(r()*8)];
+        const t=DW0+(w*7+day)*DAY+(9+Math.floor(r()*8))*HR+Math.floor(r()*4)*15*60000;
+        const lt=Math.max(4,c.lt[w]*Math.exp((r()-.5)*1.1));
+        const failed=r()<c.fail;
+        const d={k,t,lt,type:'change',failed,rec:null};
+        out.push(d);
+        if(failed){
+          const rec=Math.max(20,c.rec*Math.exp((r()-.5)*1.0));
+          const tf=Math.min(t+rec*60000,DW0+DWEEKS*7*DAY-1);
+          d.rec=(tf-t)/60000;
+          out.push({k,t:tf,lt:2+r()*4,type:'corrective',failed:false,rec:null});
+        }
+      }
+    });
+  });
+  return out.sort((a,b)=>a.t-b.t);
+})();
+const median=a=>{if(!a.length)return null;const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2;};
+function metrics(list,weeks){
+  const n=list.length,nf=list.filter(d=>d.failed).length,nc=list.filter(d=>d.type==='corrective').length;
+  return {n,nf,nc,df:n/weeks,lt:median(list.map(d=>d.lt)),cfr:n?nf/n*100:null,rec:median(list.filter(d=>d.failed).map(d=>d.rec)),rw:n?nc/n*100:null};
 }
+const inWeeks=(k,w0,w1)=>DEPLOYS.filter(d=>d.k===k&&d.t>=DW0+w0*7*DAY&&d.t<DW0+w1*7*DAY);
+function doraFor(k){return {cur:metrics(inWeeks(k,4,8),4),prev:metrics(inWeeks(k,0,4),4)};}
+const LV={
+ df:v=>v>=5?"Elite":v>=1?"High":v>=1/4.3?"Medium":"Low",
+ lt:h=>h<24?"Elite":h<168?"High":h<720?"Medium":"Low",
+ cfr:v=>v<=5?"Elite":v<=10?"High":v<=30?"Medium":"Low",
+ rec:m=>m<60?"Elite":m<1440?"High":m<10080?"Medium":"Low"
+};
+const LVC={Elite:"s-ok",High:"s-ok",Medium:"s-warn",Low:"s-ko"};
+const fmtH=h=>h==null?'n/a':h<24?(h<10?h.toFixed(1):Math.round(h))+' h':(h/24).toFixed(1)+' d';
+const fmtRec=m=>m==null?'n/a':m<60?Math.round(m)+' min':m<1440?Math.floor(m/60)+'h '+String(Math.round(m%60)).padStart(2,'0')+'m':(m/1440).toFixed(1)+' d';
+const fmtDT=t=>{const d=new Date(t);return d.getUTCDate()+' '+MON[d.getUTCMonth()]+' '+String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');};
+function deltaTxt(cur,prev,kind,hb){
+  if(cur==null||prev==null||(kind==='pct'&&prev===0)) return {t:'no comparison',c:'d-flat'};
+  let d,stable,txt;
+  if(kind==='pct'){d=(cur-prev)/prev*100;stable=Math.abs(d)<5;txt=(d>0?'+':'')+Math.round(d)+'%';}
+  else if(kind==='pts'){d=cur-prev;stable=Math.abs(d)<2;txt=(d>0?'+':'')+d.toFixed(0)+' pts';}
+  else{d=cur-prev;stable=Math.abs(d)<0.25;txt=(d>0?'+':'')+d.toFixed(1)+' / week';}
+  if(stable) return {t:'≈ stable vs previous 4 weeks',c:'d-flat'};
+  return {t:(d>0?'▲ ':'▼ ')+txt+' vs previous 4 weeks',c:(hb?d>0:d<0)?'d-good':'d-bad'};
+}
+const DROWS=[
+ {n:"Deployment frequency",sub:"deployments per week, corrective included",f:m=>m.df,fmt:v=>v.toFixed(1)+' / week',lv:LV.df,hb:1,kind:'abs'},
+ {n:"Lead time for changes",sub:"first commit to production, median",f:m=>m.lt,fmt:fmtH,lv:LV.lt,hb:0,kind:'pct'},
+ {n:"Change failure rate",sub:"failed deployments ÷ all deployments",f:m=>m.cfr,fmt:v=>v.toFixed(0)+' %',lv:LV.cfr,hb:0,kind:'pts'},
+ {n:"Failed deployment recovery time",sub:"failure to corrective deployment, median",f:m=>m.rec,fmt:fmtRec,lv:LV.rec,hb:0,kind:'pct'},
+ {n:"Deployment rework rate",sub:"corrective deployments ÷ all deployments",f:m=>m.rw,fmt:v=>v.toFixed(0)+' %',lv:null,hb:0,kind:'pts'}
+];
+function barsSvg(k){
+  const W=480,H=210,pl=28,pb=26,pt=18;
+  const rows=[];
+  for(let w=0;w<DWEEKS;w++){const l=inWeeks(k,w,w+1);rows.push({ok:l.filter(d=>d.type==='change'&&!d.failed).length,fail:l.filter(d=>d.failed).length,cor:l.filter(d=>d.type==='corrective').length});}
+  const mx=Math.max(4,...rows.map(r=>r.ok+r.fail+r.cor));
+  const ch=H-pt-pb, step=(W-pl)/DWEEKS, bw=32, sy=ch/mx, tick=Math.ceil(mx/4);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Deployments per week for ${P[k].name}">`;
+  for(let v=0;v<=mx;v+=tick){const y=pt+ch-v*sy;s+=`<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" style="stroke:var(--line)"/><text x="${pl-6}" y="${y+4}" text-anchor="end" font-size="11" style="fill:var(--ink-2)">${v}</text>`;}
+  rows.forEach((r,w)=>{
+    const x=pl+w*step+(step-bw)/2; let y=pt+ch;
+    [[r.ok,P[k].c],[r.fail,'var(--ko)'],[r.cor,'var(--warn)']].forEach(([n,c])=>{if(!n)return;const h=n*sy;y-=h;s+=`<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(1,h-1)}" rx="2" style="fill:${c}"/>`;});
+    const tot=r.ok+r.fail+r.cor;
+    if(tot) s+=`<text x="${x+bw/2}" y="${y-4}" text-anchor="middle" font-size="11" style="fill:var(--ink)">${tot}</text>`;
+    s+=`<text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="11" style="fill:var(--ink-2)">W${DW_FIRST+w}</text>`;
+  });
+  return s+'</svg>';
+}
+function leadSvg(k){
+  const l=DEPLOYS.filter(d=>d.k===k);
+  const W=480,H=210,pl=34,pb=26,pt=14,pr=8;
+  const mx=Math.max(2,Math.ceil(Math.max(...l.map(d=>d.lt/24))/2)*2);
+  const ch=H-pt-pb, cw=W-pl-pr, tick=mx/4;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Lead time per deployment for ${P[k].name}">`;
+  for(let v=0;v<=mx+0.001;v+=tick){const y=pt+ch-v/mx*ch;s+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" style="stroke:var(--line)"/><text x="${pl-6}" y="${y+4}" text-anchor="end" font-size="11" style="fill:var(--ink-2)">${Math.round(v*10)/10}</text>`;}
+  for(let w=0;w<DWEEKS;w+=2){const x=pl+w/DWEEKS*cw;s+=`<text x="${x+2}" y="${H-8}" font-size="11" style="fill:var(--ink-2)">W${DW_FIRST+w}</text>`;}
+  const m=median(l.map(d=>d.lt/24)); const ym=pt+ch-m/mx*ch;
+  s+=`<line x1="${pl}" x2="${W-pr}" y1="${ym}" y2="${ym}" stroke-dasharray="5 4" style="stroke:var(--ink-2)"/><text x="${W-pr}" y="${ym-4}" text-anchor="end" font-size="11" style="fill:var(--ink-2)">median ${m.toFixed(1)} d</text>`;
+  l.forEach(d=>{
+    const cx=pl+(d.t-DW0)/(DWEEKS*7*DAY)*cw, cy=pt+ch-(d.lt/24)/mx*ch;
+    const c=d.type==='corrective'?'var(--warn)':d.failed?'var(--ko)':P[k].c;
+    s+=`<circle cx="${cx}" cy="${cy}" r="4.5" style="fill:${c};fill-opacity:.85;stroke:var(--surface)"/>`;
+  });
+  return s+'</svg>';
+}
+let dSel="p1";
 function renderD(){
-  chips(document.getElementById('dFilters'),dfSel,v=>{dfSel=v;renderD()});
-  const s=k=>dfSel==="all"?avgSeries(k):D[dfSel][k];
-  const M=[
-   {k:"df",n:"Deployment frequency",u:" / week",higher:1,lvl:v=>v>=5?"Elite":v>=1?"High":"Medium"},
-   {k:"lt",n:"Lead time for changes",u:" days",higher:0,lvl:v=>v<1?"Elite":v<7?"High":"Medium"},
-   {k:"cf",n:"Change failure rate",u:" %",higher:0,lvl:v=>v<=5?"Elite":v<=15?"High":"Medium"},
-   {k:"mt",n:"Time to restore service",u:" h",higher:0,lvl:v=>v<1?"Elite":v<24?"High":"Medium"}
-  ];
-  document.getElementById('doraCards').innerHTML=M.map(m=>{
-    const v=s(m.k),last=v[v.length-1],first=v[0];
-    const good=m.higher?last>=first:last<=first;
-    const fmt=x=>(Math.round(x*10)/10).toString();
-    return `<div class="box metric"><h3>${m.n}</h3><div class="val">${fmt(last)}${m.u}</div>
-    <div class="lvl">${m.lvl(last)} level · ${good?'improving':'worsening'} over 8 weeks</div>${spark(v,good)}</div>`;
-  }).join('');
+  const ks=Object.keys(P), res={}; ks.forEach(k=>res[k]=doraFor(k));
+  let h=`<tr><th>Last 4 weeks</th>${ks.map(k=>`<th class="proj">${tag(k)}</th>`).join('')}</tr>`;
+  DROWS.forEach(r=>{
+    h+=`<tr><td><span class="mname">${r.n}</span><span class="msub">${r.sub}</span></td>`+ks.map(k=>{
+      const {cur,prev}=res[k], v=r.f(cur), pv=r.f(prev);
+      if(v==null) return `<td><span class="val">n/a</span><span class="dl d-flat">${r.n==="Failed deployment recovery time"?'no failed deployment in the period':'no deployment in the period'}</span></td>`;
+      const dl=deltaTxt(v,pv,r.kind,r.hb);
+      const chip=r.lv?`<span class="status lvl ${LVC[r.lv(v)]}">${r.lv(v)}</span>`:`<span class="status lvl s-warn" style="background:var(--surface-2);color:var(--ink-2)">no benchmark</span>`;
+      return `<td><span class="val">${r.fmt(v)}</span>${chip}<span class="dl ${dl.c}">${dl.t}</span></td>`;
+    }).join('')+'</tr>';
+  });
+  h+=`<tr class="samp"><td>Sample</td>${ks.map(k=>{const c=res[k].cur;return `<td>${c.n} deployments, ${c.nf} failed, ${c.nc} corrective${c.n<10?' · <b>small sample</b>':''}</td>`;}).join('')}</tr>`;
+  document.getElementById('doraCmp').innerHTML=h;
+  document.getElementById('doraFoot').textContent="With fewer than 10 deployments in four weeks, a single failure moves the change failure rate by 10 points or more. Read the trend over several periods rather than one value, and compare each project with its own history.";
+
+  const fe=document.getElementById('dFilters');
+  fe.innerHTML=ks.map(k=>`<button class="chip" aria-pressed="${k===dSel}" data-v="${k}">${P[k].name}</button>`).join('');
+  fe.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{dSel=b.dataset.v;renderD()});
+  document.getElementById('dBars').innerHTML=barsSvg(dSel);
+  document.getElementById('dLeg').innerHTML=`<span><i style="background:${P[dSel].c}"></i>Change deployed</span><span><i style="background:var(--ko)"></i>Failed deployment</span><span><i style="background:var(--warn)"></i>Corrective deployment</span>`;
+  document.getElementById('dLead').innerHTML=leadSvg(dSel);
+  const rows=DEPLOYS.filter(d=>d.k===dSel).slice(-12).reverse();
+  document.getElementById('dLog').innerHTML=`<tr><th>Deployed</th><th>Type</th><th>Lead time</th><th>Result</th><th>Recovery</th></tr>`+rows.map(d=>`<tr><td>${fmtDT(d.t)}</td><td>${d.type==='corrective'?'Corrective (hotfix / rollback)':'Change'}</td><td>${fmtH(d.lt)}</td><td>${d.failed?'<span class="status s-ko">Failed</span>':'<span class="status s-ok">OK</span>'}</td><td>${d.failed?fmtRec(d.rec):'—'}</td></tr>`).join('');
 }
 renderD();
 
@@ -679,7 +832,7 @@ const RULES=`- Use only the data provided below. If something is missing, write 
 - Do not make or recommend technical decisions (architecture, tools, engineering practices). Raise them as questions for the tech lead.
 - Write in plain English, short sentences, no jargon.`;
 const UC=[
- {id:"status",label:"Weekly status report",sub:"For the steering committee",needs:["projects","deps","raid","inc","blocked"],
+ {id:"status",label:"Weekly status report",sub:"For the steering committee",needs:["projects","deps","raid","inc","blocked","dora"],
   role:"You are an assistant to a project manager who works alongside a tech lead. You write clear, factual delivery reports for non-technical stakeholders.",
   task:"Write this week's status report for the steering committee.",
   format:"1. Headline (2 sentences max)\n2. One line per project: status (Green / Amber / Red), variance, next milestone\n3. Top 3 risks, each with a proposed mitigation and an owner\n4. Decisions needed this week\n5. Overdue client deliverables\nMaximum 250 words.",
@@ -689,7 +842,7 @@ const UC=[
   task:"Draft an email to the client about the overdue or at-risk deliverables listed under CLIENT DEPENDENCIES (status Late, Partly received or No news). For each one, state what is needed, by when, and the concrete impact on the schedule if it is late. Offer a 15-minute call to unblock. If several clients are involved, write one email per client.",
   format:"Two variants per email: (a) short, 5 lines maximum; (b) detailed, with a bullet list. Include a subject line. No blame.",
   out:"Two email drafts per client.",check:"Tone, and that nothing is promised on the team's behalf."},
- {id:"risk",label:"Delay-risk scan",sub:"Which project might slip?",needs:["projects","deps","raid","inc","blocked"],
+ {id:"risk",label:"Delay-risk scan",sub:"Which project might slip?",needs:["projects","deps","raid","inc","blocked","dora"],
   role:"You are a delivery risk analyst supporting a project manager.",
   task:"Identify which projects are most likely to miss their go-live date.",
   format:"For each project: likelihood of missing go-live (Low / Medium / High), the 2 to 3 signals behind it, the action to take this week and who must take it. Then list any data that looks inconsistent or missing.",
@@ -732,6 +885,10 @@ function ctxText(scope,needs){
   }
   if(needs.includes('rice')){
     out.push('RICE BACKLOG (reach per quarter, impact 0.25-3, confidence %, effort in person-weeks)\n'+R.filter(inS).map(x=>`- ${P[x.k].name} | ${x.f} | R ${x.r} | I ${x.i} | C ${x.c}% | E ${x.e} | score ${Math.round(riceScore(x))}`).join('\n'));
+  }
+  if(needs.includes('dora')){
+    const nz=(v,f)=>v==null?'n/a':f(v);
+    out.push('DELIVERY METRICS (DORA, computed per project from the deployment log; last 4 weeks, previous 4 weeks in brackets)\n'+ks.map(k=>{const {cur,prev}=doraFor(k);return `- ${P[k].name}: ${cur.n} deployments, ${cur.nf} failed; frequency ${cur.df.toFixed(1)}/week (${prev.df.toFixed(1)}); median lead time ${fmtH(cur.lt)} (${fmtH(prev.lt)}); change failure rate ${nz(cur.cfr,v=>v.toFixed(0)+'%')} (${nz(prev.cfr,v=>v.toFixed(0)+'%')}); median recovery ${fmtRec(cur.rec)} (${fmtRec(prev.rec)}); rework rate ${nz(cur.rw,v=>v.toFixed(0)+'%')}`;}).join('\n'));
   }
   return out.join('\n\n');
 }
